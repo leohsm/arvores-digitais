@@ -1,0 +1,16 @@
+# Binários
+*.exe
+
+# Dados de entrada (Moodle) e material da disciplina
+*.csv
+22_Projeto_Arvores_Digitais-3.pdf
+
+# Arquivos gerados pelo programa
+consultas.txt
+saida*.txt
+
+# Dependências do gerador do relatório
+node_modules/
+
+# Pacote de entrega
+*.zip

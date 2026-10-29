@@ -1,0 +1,42 @@
+# Rotas: 1101804 | interfaces: 16 | leitura+parse do CSV: 342 ms
+# Go go1.25.2 windows/amd64, 8 CPUs, consultas por trace: 2000000, repetições: 7 (mediana)
+
+## Construção e memória
+estrutura            build (ms) estrutural(MB)    heap (MB)  detalhes
+Patricia                  116.5           30.9         33.6  2023207 nós (1101804 com rota, 921403 de junção)
+LC-Trie f=1.00            100.1           22.3         24.6  trie=1443123 nós, base=997665 (0 sintéticas), pv=104139
+LC-Trie f=0.75             95.9           23.7         28.5  trie=1421899 nós, base=1093582 (95917 sintéticas), pv=104139
+LC-Trie f=0.50            104.6           25.9         28.5  trie=1513809 nós, base=1213916 (216251 sintéticas), pv=104139
+LC-Trie f=0.25            115.7           28.3         33.2  trie=1629145 nós, base=1342660 (344995 sintéticas), pv=104139
+Hash por tamanho           83.0            0.0         15.0  baseline (maps do Go; memória só pelo heap)
+
+## Consulta - trace rotas (endereços dentro de rotas da tabela)
+estrutura            ns/cons.      Mcons/s  prof. média  prof. máx     ok
+Patricia                522.7         1.91        23.26         30    sim
+LC-Trie f=1.00          121.8         8.21         7.93         16    sim   (4.29x vs Patricia)
+LC-Trie f=0.75          110.4         9.06         5.85         14    sim   (4.74x vs Patricia)
+LC-Trie f=0.50          112.1         8.92         5.69         14    sim   (4.66x vs Patricia)
+LC-Trie f=0.25          110.8         9.03         5.64         14    sim   (4.72x vs Patricia)
+Hash por tamanho        232.9         4.29         9.89         25    sim   (2.24x vs Patricia)
+
+## Consulta - trace aleatorio (32 bits uniformes)
+estrutura            ns/cons.      Mcons/s  prof. média  prof. máx     ok
+Patricia                224.5         4.45        14.96         25    sim
+LC-Trie f=1.00           95.6        10.46         6.33         15    sim   (2.35x vs Patricia)
+LC-Trie f=0.75           65.1        15.35         4.11         12    sim   (3.45x vs Patricia)
+LC-Trie f=0.50           63.9        15.65         3.98         12    sim   (3.51x vs Patricia)
+LC-Trie f=0.25           62.4        16.01         3.94         12    sim   (3.60x vs Patricia)
+Hash por tamanho        466.4         2.14        19.67         26    sim   (0.48x vs Patricia)
+
+## Consulta - trace misto (50/50)
+estrutura            ns/cons.      Mcons/s  prof. média  prof. máx     ok
+Patricia                401.7         2.49        19.14         29    sim
+LC-Trie f=1.00          117.8         8.49         7.13         14    sim   (3.41x vs Patricia)
+LC-Trie f=0.75           94.7        10.56         4.99         12    sim   (4.24x vs Patricia)
+LC-Trie f=0.50           94.1        10.63         4.84         12    sim   (4.27x vs Patricia)
+LC-Trie f=0.25           98.5        10.16         4.79         12    sim   (4.08x vs Patricia)
+Hash por tamanho        363.2         2.75        14.76         26    sim   (1.11x vs Patricia)
+
+## Atualização incremental
+Patricia: 10000 inserções incrementais em 6.55 ms (655 ns/inserção)
+LC-Trie : 1 atualização exige reconstrução completa: 474.8 ms
